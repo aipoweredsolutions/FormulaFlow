@@ -1158,10 +1158,17 @@ export default function AdminGrid() {
                   }
                   onClick={() => rematchRequest(data.id)}
                   type="button"
+                  title={
+                    data.payout_status === "FAILED"
+                      ? "The previous payout failed. Choose a merchant before retrying."
+                      : undefined
+                  }
                 >
                   {pendingRequestActions.has(`${data.id}:match`)
                     ? "Matching..."
-                    : "Match merchant"}
+                    : data.matched_vendor
+                      ? "Change merchant"
+                      : "Match merchant"}
                 </button>
               </div>
             );
@@ -1246,11 +1253,20 @@ export default function AdminGrid() {
               data.payout_status === "SUCCESS"
                 ? "PayPal reports success; confirmation pending"
                 : data.payout_status === "UNCLAIMED"
-                  ? "Unclaimed by recipient"
+                  ? "Merchant hasn't claimed PayPal payout (pending)"
                   : `PayPal status: ${data.payout_status.toLowerCase()}`;
             return (
               <div className="request-actions">
-                <span className="payout-state">{payoutMessage}</span>
+                <span
+                  className="payout-state"
+                  title={
+                    data.payout_status === "UNCLAIMED"
+                      ? "PayPal has not confirmed this payment. Verify the merchant's PayPal email and wait for an update; do not send another payout while it is pending."
+                      : undefined
+                  }
+                >
+                  {payoutMessage}
+                </span>
                 <button
                   className="action-button"
                   disabled={pendingRequestActions.has(`${data.id}:refresh`)}

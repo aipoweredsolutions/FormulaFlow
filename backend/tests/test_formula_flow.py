@@ -1336,6 +1336,7 @@ class FormulaFlowIntegrationTests(unittest.TestCase):
                     phone_number="demo-only",
                     location="Demo Location",
                     formula_needs="Demo request",
+                    infant_age_months=2,
                     status=RequestStatus.APPROVED.value,
                 )
                 payout_session.add(webhook_request)
@@ -1439,6 +1440,37 @@ class FormulaFlowIntegrationTests(unittest.TestCase):
                 )
             finally:
                 payout_session.close()
+
+            alternate_merchant = client.put(
+                "/api/admin/vendors/Alternate%20Pharmacy",
+                headers=auth,
+                json={
+                    "name": "Alternate Pharmacy",
+                    "location": "Demo Location",
+                    "paypal_email": "alternate@example.test",
+                    "price_per_container_usd": "12.00",
+                },
+            )
+            self.assertEqual(
+                alternate_merchant.status_code, 200, alternate_merchant.text
+            )
+            rematched_failed_request = client.post(
+                f"/api/admin/requests/{webhook_request_id}/match",
+                headers=auth,
+                json={"merchant_id": alternate_merchant.json()["id"]},
+            )
+            self.assertEqual(
+                rematched_failed_request.status_code,
+                200,
+                rematched_failed_request.text,
+            )
+            self.assertEqual(
+                rematched_failed_request.json()["matched_vendor"],
+                "Alternate Pharmacy",
+            )
+            self.assertEqual(
+                rematched_failed_request.json()["total_cost_usd"], "36.00"
+            )
 
             create_order.return_value = {"order_id": "ORDER-SIMULATED"}
             capture_order.return_value = {

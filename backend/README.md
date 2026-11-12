@@ -14,6 +14,15 @@ python -m pip install -r backend\requirements.txt
 uvicorn backend.main:app --reload
 ```
 
+For production on Linux, the API runs under Gunicorn with an ASGI worker:
+
+```sh
+gunicorn backend.main:app --workers 1 --worker-class uvicorn_worker.UvicornWorker --bind 0.0.0.0:${PORT:-8000}
+```
+
+Gunicorn is not supported on Windows; use Uvicorn for local development. The
+Render API service is configured to start with Gunicorn.
+
 For the frontend, copy `frontend/.env.example` to `frontend/.env.local` and set
 `VITE_PAYPAL_CLIENT_ID` to the same Sandbox app's client ID. The client ID is
 public and is used by PayPal's browser SDK; never put the REST client secret in
@@ -221,6 +230,11 @@ that the recipient claimed the payout; it is not a completed payment. Check
 that the supplier email belongs to the intended PayPal account, then use
 **Check PayPal status** in the dashboard to recheck the existing payout. Do not
 submit another payout while its status is unclaimed or otherwise pending.
+In the dashboard this is shown as **Merchant hasn't claimed PayPal payout
+(pending)**; the recipient here is the merchant receiving the PayPal transfer,
+not the family receiving formula. Matching is locked while a payout is pending
+to avoid paying twice. After PayPal confirms a payout as failed, the request
+can be matched to the same or a different merchant before retrying.
 
 ### If Sandbox Payouts is not enabled
 
