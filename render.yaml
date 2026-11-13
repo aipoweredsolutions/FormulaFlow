@@ -10,7 +10,7 @@ services:
       - key: DATABASE_URL
         value: sqlite:////var/data/formula_requests.db
       - key: FRONTEND_ORIGINS
-        value: https://formula-flow-9461.vercel.app/
+        value: https://formula-flow-uh98.vercel.app
       - key: PAYPAL_ENVIRONMENT
         value: sandbox
       - key: PAYPAL_CLIENT_ID
@@ -40,7 +40,7 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://formulaflow-api.onrender.com
+        value: https://formula-flow-9461.vercel.app
       - key: VITE_PAYPAL_CLIENT_ID
         sync: false
       - key: VITE_AG_STUDIO_LICENSE_KEY
