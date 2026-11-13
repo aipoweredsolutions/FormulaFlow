@@ -10,7 +10,7 @@ services:
       - key: DATABASE_URL
         value: sqlite:////var/data/formula_requests.db
       - key: FRONTEND_ORIGINS
-        value: https://formulaflow-frontend.onrender.com
+        value: https://formula-flow-9461.vercel.app/
       - key: PAYPAL_ENVIRONMENT
         value: sandbox
       - key: PAYPAL_CLIENT_ID
